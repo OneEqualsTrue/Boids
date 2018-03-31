@@ -1,22 +1,17 @@
 from random import *
 from tkinter import *
-import time
 
-X 		= 800
-Y 		= 600
-SIZE 	= 5
-SPEED 	= 50
-N 		= 25
-Wind 	= 13
-Time 	= 230
+X 		= 800 # Window horizontal
+Y 		= 600 # Window diagonal
+SIZE 	= 5 # Radius of boid draw
+SPEED 	= 40 # Smaller is faster
+N 		= 25 # Number of boids
 
 class Boid:
 	def __init__(self, name):
 		self.position = [randint(0,X-1), randint(0,Y-1)]
 		self.velocity = [0, 0]
-
 		boids.append(self)
-		self.draw()
 
 	def draw(self):
 
@@ -79,14 +74,7 @@ def rule3(bj):
 	return pvj
 
 def update():
-	global Time
 	graph.delete(ALL)
-
-	if Time > 0:
-		root.label.configure(text=Time)
-		Time -= 1
-	else:
-		root.label.configure(text="WIND FROM THE WEST")
 
 	for b in boids:
 		v1 = rule1(b)
@@ -107,33 +95,9 @@ def update():
 
 	graph.after(SPEED, update)
 
-def update_with_wind():
-	root.label.configure(text="WIND FROM THE WEST")
-	graph.delete(ALL)
-
-	for b in boids:
-		v1 = rule1(b)
-		v2 = rule2(b)
-		v3 = rule3(b)
-
-		if b.velocity[0] > 0:
-			b.velocity[0] = b.velocity[0] + v3[0] + v2[0] + v1[0] - randint(1,Wind)
-		else:
-			b.velocity[0] = b.velocity[0] + v3[0] + v2[0] + v1[0] - Wind
-		b.velocity[1] = b.velocity[1] + v3[1] + v2[1] + v1[1]
-
-		b.position[0] = b.position[0] + b.velocity[0]
-		b.position[1] = b.position[1] + b.velocity[1]
-
-		b.draw()
-		b.velocity[0] +=  Wind
-
-	graph.after(SPEED, update_with_wind)
-
 def main():
 	global graph
 	global boids
-	global root
 	boids = []
 
 	root = Tk()
@@ -141,13 +105,11 @@ def main():
 	root.bind_all('<Escape>', lambda event: event.widget.quit())
 
 	graph = Canvas(root, width=X, height=Y, background='#ecede8')
-	root.label = Label(root, text="")
-	root.label.pack()
+	Label(root, text="Press ESC to exit").pack()
 	
 	for i in range(N): Boid(i)
 
 	graph.after(SPEED, update)
-	graph.after(15000, update_with_wind)
 	graph.pack()
 
 	mainloop()
